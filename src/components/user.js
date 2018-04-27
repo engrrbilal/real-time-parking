@@ -59,7 +59,7 @@ class User extends React.Component{
             startTime:null,
             endTime:null,
             pushKey:"",
-            selectedSlotsIndex:[],
+            selectedSlotsIndex:'',
             parkingSlots:[],
             booked:"true",
             bookingDate:'',
@@ -146,7 +146,7 @@ class User extends React.Component{
           if(this.state.selectedSlotsIndex)
           {
             this.setState({
-                selectedSlotsIndex:[]
+                selectedSlotsIndex:''
             })
           }
         this.setState({
@@ -188,14 +188,29 @@ class User extends React.Component{
         let currentDay = todayDate.getDate()
         let currentMonth = todayDate.getMonth()
         let currentYear = todayDate.getFullYear()
+        let bookingStartTime = this.state.startTime;
+        let startTime=bookingStartTime.getTime()
+        let bookingEndTime = this.state.endTime;
+        let endTime=bookingEndTime.getTime();
+        let currentTime = Date.now();
             this.state.parkingSlots.map((slotRef,index)=>{
                 slotRef.Bookings?Object.keys(slotRef.Bookings).map((slot)=>{
                     if(currentDay===slotRef.Bookings[slot].bookingDay && currentMonth===slotRef.Bookings[slot].bookingMonth
                          && currentYear===slotRef.Bookings[slot].bookingYear){
-                        if(slotRef.Bookings[slot].booked==="true"){
-                            this.state.bgColor.splice(index,1,"red")
-                            console.log(index)
-                    }
+                            if(slotRef.Bookings[slot].booked==="true"){
+                                if(startTime > slotRef.Bookings[slot].endTime){
+                                    console.log("green")
+                                    this.state.bgColor.splice(index+1,1,"green")
+                                 }
+                                 else if(currentTime>endTime || currentTime>startTime){
+                                    for(let i=0;i<50;i++){
+                                        this.state.bgColor.splice(i,1,"green")
+                                      }
+                                 }
+                                 else{
+                                    this.state.bgColor.splice(index,1,"red")
+                                 }
+                            }
                     }
                     else{
                         if(slotRef.Bookings[slot].booked==="true"){
@@ -208,25 +223,20 @@ class User extends React.Component{
         this.setState({open2: true});
       };
       bookSlots = (slotIndex)=>{
-          let result=[]
           this.state.parkingSlots.map((slot,index)=>{
               if(slotIndex===index){
                 this.state.bgColor.splice(index,1,"red")
                     this.setState({
-                        selectedSlotsIndex:this.state.selectedSlotsIndex.concat(slotIndex)
+                        selectedSlotsIndex:slotIndex
                     })
             }
             
           })
       }
       sendBookedSlots=()=>{
-          if(this.state.bookingDate===null || this.state.startTime===null|| this.state.endTime===null)
+          if(this.state.selectedSlotsIndex.length <=0)
           {
-              alert("Please select the date & time !")
-          }
-          else if(this.state.selectedSlotsIndex.length <=0)
-          {
-              alert("Please select the Slots for booking!")
+              alert("Please select the Slot for booking!")
           }
           else
           {
@@ -235,8 +245,9 @@ class User extends React.Component{
             let bookingMonth = bookingDate.getMonth();
             let bookingYear = bookingDate.getFullYear();
             let bookingStartTime = this.state.startTime;
-            console.log(bookingStartTime)
             let startTime=bookingStartTime.getTime()
+            console.log(bookingStartTime)
+            console.log(startTime)
             let bookingEndTime = this.state.endTime;
             let endTime=bookingEndTime.getTime();
             let currentTime = Date.now();
@@ -244,36 +255,39 @@ class User extends React.Component{
             let currentDay = todayDate.getDate()
             let currentMonth = todayDate.getMonth()
             let currentYear = todayDate.getFullYear()
-            
-            if(endTime===startTime){
+            if(startTime>endTime){
                 alert("Please Select the time correctly!")
             }
-            else{
-                this.props.startBooking({
-                    bookingDate:this.state.bookingDate,
-                    bookingDay:bookingDay,
-                    bookingMonth:bookingMonth,
-                    bookingYear:bookingYear,
-                    startTime:startTime,
-                    endTime:endTime,
-                    selectedSlotsIndex:this.state.selectedSlotsIndex,
-                    userUid:this.state.userUid,
-                    pushKey:this.state.pushKey,
-                    parkingArea:this.state.parkingArea,
-                    parkingPlace:this.state.parkingPlace
-                  })
-                  this.setState({
-                    open:false,
-                    selectedSlotsIndex:[],
-                    controlledDate:'',
-                    startTime:null,
-                    endTime:null,
-                })
-                for(let i=0;i<50;i++){
-                    this.state.bgColor.splice(i,1,"green")
-                  }
-            }
-              
+            else if(currentDay===bookingDay){
+                if(currentTime>startTime || currentTime>endTime || startTime>endTime){
+                    alert("Please Select the time correctly!")
+                    }
+                    else{
+                        this.props.startBooking({
+                            bookingDate:this.state.bookingDate,
+                            bookingDay:bookingDay,
+                            bookingMonth:bookingMonth,
+                            bookingYear:bookingYear,
+                            startTime:startTime,
+                            endTime:endTime,
+                            selectedSlotsIndex:this.state.selectedSlotsIndex,
+                            userUid:this.state.userUid,
+                            pushKey:this.state.pushKey,
+                            parkingArea:this.state.parkingArea,
+                            parkingPlace:this.state.parkingPlace
+                          })
+                          this.setState({
+                            open:false,
+                            selectedSlotsIndex:[],
+                            controlledDate:'',
+                            startTime:null,
+                            endTime:null,
+                        })
+                        for(let i=0;i<50;i++){
+                            this.state.bgColor.splice(i,1,"green")
+                          }
+                    }
+            }  
           }
       }
       cancelBooking(cancelIndex,pushKey,bookingPushKey){
