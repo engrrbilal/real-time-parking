@@ -137,6 +137,7 @@ class User extends React.Component{
             controlledDate:'',
             startTime:null,
             endTime:null,
+            counter:0
         })
 
       };
@@ -147,11 +148,13 @@ class User extends React.Component{
           if(this.state.selectedSlotsIndex)
           {
             this.setState({
-                selectedSlotsIndex:''
+                selectedSlotsIndex:'',
+                counter:0
             })
           }
         this.setState({
-            open2: false
+            open2: false,
+            counter:0
         })
       };
       handleBookingSlots = () => {
@@ -214,7 +217,8 @@ class User extends React.Component{
             if(startTime>endTime){
                 alert("Please Select the time correctly!")
             }
-            else if((currentDay===bookingDay)&&(currentTime>startTime|| currentTime>=endTime || startTime>=endTime)){
+            else if((currentDay===bookingDay && currentMonth===bookingMonth && currentYear===bookingYear) &&
+            (currentTime>startTime|| currentTime>=endTime || startTime>=endTime)){
                     alert("Please Select the time correctly!")
                 
             }
@@ -238,7 +242,9 @@ class User extends React.Component{
                                          }
                                          console.log("green",bookingDay,index)
                                    }
-                                   if(startTime <= slotRef.Bookings[slot].endTime && startTime >= slotRef.Bookings[slot].startTime){
+                                   if((startTime >= slotRef.Bookings[slot].startTime && startTime <= slotRef.Bookings[slot].endTime )||
+                                   (startTime <= slotRef.Bookings[slot].startTime && endTime >= slotRef.Bookings[slot].endTime )||
+                                   (startTime <= slotRef.Bookings[slot].startTime && endTime <= slotRef.Bookings[slot].endTime )){
                                     console.log("red",bookingDay,index)
                                     this.state.bgColor.splice(index,1,"red")
                                     }
@@ -253,7 +259,9 @@ class User extends React.Component{
                            console.log("else",slotRef.Bookings[slot].bookingDay,slotRef.Bookings[slot].bookingMonth,slotRef.Bookings[slot].bookingYear)
                            if(slotRef.Bookings[slot].booked==="true"){
                                 console.log("else",bookingDay,slotRef.Bookings[slot].endTime)
-                                if(startTime <= slotRef.Bookings[slot].endTime && startTime >= slotRef.Bookings[slot].startTime){
+                                if((startTime >= slotRef.Bookings[slot].startTime && startTime <= slotRef.Bookings[slot].endTime )||
+                                   (startTime <= slotRef.Bookings[slot].startTime && endTime >= slotRef.Bookings[slot].endTime )||
+                                   (startTime <= slotRef.Bookings[slot].startTime && endTime <= slotRef.Bookings[slot].endTime )){
                                     console.log("red",bookingDay,index)
                                     this.state.bgColor.splice(index,1,"red")
                                     }
@@ -319,6 +327,7 @@ class User extends React.Component{
                     controlledDate:'',
                     startTime:null,
                     endTime:null,
+                    counter:0
                 })
                 for(let i=0;i<50;i++){
                     this.state.bgColor.splice(i,1,"green")

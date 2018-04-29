@@ -226,7 +226,10 @@ export const startBooking = (booking={}) => {
       parkingArea='',
       parkingPlace=''
       } = booking;
-      // console.log(booking)
+      let startTimeHours=new Date(startTime).getHours()
+      let startTimeMinutes=new Date(startTime).getMinutes()
+      let endTimeHours=new Date(endTime).getHours()
+      let endTimeMinutes=new Date(endTime).getMinutes()
     firebase.database().ref(`/ParkingAreas/${pushKey}/Slots/`).once('value').then((snapshot) => {
       const data = snapshot.val()
       for (let key in data){
@@ -239,7 +242,7 @@ export const startBooking = (booking={}) => {
             booked:"true",bookingDay,bookingMonth,bookingYear,startTime,endTime,userUid,parkingArea,parkingPlace,bookingPushKey:bookingPushKey
           }).then(() => {
             dispatch(bookingData(booking));
-            alert(`You have booked slot ${selectedSlotsIndex+1} successfully!`)
+            alert(`You have booked slot ${selectedSlotsIndex+1} from ${startTimeHours}:${startTimeMinutes} to ${endTimeHours}:${endTimeMinutes} successfully!`)
           })
         }
       }
