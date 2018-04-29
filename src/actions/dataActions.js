@@ -203,29 +203,6 @@ export const getAreaData = (test={}) => {
             ...childSnapshot.val()
           });
         });
-        data.map((bookings)=>{
-          (bookings.Slots)?
-          bookings.Slots.map((slotRef,index)=>{
-            slotRef.Bookings?Object.keys(slotRef.Bookings).map((slot)=>{
-                  if(slotRef.Bookings[slot].booked==="true"){
-                    let todayTime = Date.now();
-                    let todayDate = new Date()
-                    let currentDay = todayDate.getDate()
-                    let currentMonth = todayDate.getMonth()
-                    let currentYear = todayDate.getFullYear()
-                    // console.log(currentDay,currentMonth,currentYear)
-                    // console.log(slot.bookingDay,slot.bookingMonth,slot.bookingYear)
-                    if(currentDay>=slotRef.Bookings[slot].bookingDay && currentMonth<=slotRef.Bookings[slot].bookingMonth && 
-                      currentYear<=slotRef.Bookings[slot].bookingYear){
-                    if(todayTime>=slotRef.Bookings[slot].endTime){
-                      firebase.database().ref(`/ParkingAreas/${bookings.pushKey}/Slots/${index}/Bookings/${slotRef.Bookings[slot].bookingPushKey}/`).update({booked:"false",
-                      startTime:'',endTime:'',userUid:'',parkingArea:'',parkingPlace:'',bookingPushKey:''})
-                    }
-                    }
-            }
-          }):""
-          }):console.log("no slots")
-        })
       })
     })
   };
@@ -243,29 +220,27 @@ export const startBooking = (booking={}) => {
       bookingYear='',
       startTime='',
       endTime='',
-      selectedSlotsIndex=[],
+      selectedSlotsIndex='',
       userUid='',
       pushKey='',
       parkingArea='',
       parkingPlace=''
       } = booking;
+      // console.log(booking)
     firebase.database().ref(`/ParkingAreas/${pushKey}/Slots/`).once('value').then((snapshot) => {
       const data = snapshot.val()
       for (let key in data){
-        for(let index in selectedSlotsIndex){
-          if(key == selectedSlotsIndex[index])
-        {
-          const selectedSlots = selectedSlotsIndex[index]+1
-          console.log(selectedSlotsIndex[index])
-          let bookingRef = firebase.database().ref(`/ParkingAreas/${pushKey}/Slots/${selectedSlotsIndex[index]}/Bookings`).push()
+        if(key == selectedSlotsIndex)
+         {
+          console.log(selectedSlotsIndex+1)
+          let bookingRef = firebase.database().ref(`/ParkingAreas/${pushKey}/Slots/${selectedSlotsIndex}/Bookings`).push()
           let bookingPushKey =  bookingRef.getKey()
           bookingRef.set({
             booked:"true",bookingDay,bookingMonth,bookingYear,startTime,endTime,userUid,parkingArea,parkingPlace,bookingPushKey:bookingPushKey
           }).then(() => {
             dispatch(bookingData(booking));
-            alert(`You have booked slot ${selectedSlots} successfully!`)
+            alert(`You have booked slot ${selectedSlotsIndex+1} successfully!`)
           })
-        }
         }
       }
     })

@@ -69,17 +69,17 @@ logOut =()=>{
           <AppBar
                 title={"Real Time Parking"} style={{backgroundColor:"blue"}}
                 iconElementLeft={<IconButton></IconButton>}
-                iconElementRight={this.state.authed? <RaisedButton backgroundColor="blue" labelColor="white"
-                label="Sign out" onClick={() => firebase.auth().signOut().then(this.logOut())} 
-                />:<FlatButton label="Sign in" onClick={() => history.push('/')} />}
+                iconElementRight={this.state.authed? <RaisedButton backgroundColor="blue" labelColor="yellow"
+                label="Sign out"  onClick={() => firebase.auth().signOut().then(this.logOut())} 
+                />:<FlatButton label="Sign in"  onClick={() => history.push('/')} />}
            />
           <Router history={history}>
-            <switch>
-              <Route exact path="/" component={Login}/>
-              <Route path="/signup" component={Signup} />
-              <PrivateRoute1  authed={this.state.authed} path="/admin" component={Admin}/>
-              <PrivateRoute2 authed={this.state.authed} path="/user" component={User} />
-            </switch>
+            <div>
+                <Route exact path="/" component={Login}/>
+                <Route path="/signup" component={Signup} />
+                <PrivateRoute1  authed={this.state.authed} path="/admin" component={Admin}/>
+                <PrivateRoute2 authed={this.state.authed} path="/user" component={User} />
+            </div>
       </Router>
       </div>
     );
