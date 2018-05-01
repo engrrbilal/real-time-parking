@@ -55,11 +55,11 @@ class User extends React.Component{
             contactNo:0,
             address:"Not added",
             update:false,
-            controlledDate: null,
+            controlledDate:null,
             startTime:null,
             endTime:null,
             pushKey:"",
-            selectedSlotsIndex:'',
+            selectedSlotsIndex:[],
             parkingSlots:[],
             booked:"true",
             bookingDate:'',
@@ -134,10 +134,9 @@ class User extends React.Component{
         this.setState({
             open:false,
             selectedSlotsIndex:'',
-            controlledDate:'',
+            controlledDate:null,
             startTime:null,
             endTime:null,
-            counter:0
         })
 
       };
@@ -145,16 +144,9 @@ class User extends React.Component{
           for(let i=0;i<50;i++){
             this.state.bgColor.splice(i,1,"green")
           }
-          if(this.state.selectedSlotsIndex)
-          {
-            this.setState({
-                selectedSlotsIndex:'',
-                counter:0
-            })
-          }
         this.setState({
             open2: false,
-            counter:0
+            selectedSlotsIndex:[],
         })
       };
       handleBookingSlots = () => {
@@ -162,7 +154,7 @@ class User extends React.Component{
         {
             alert("Please select the Slot for booking!")
         }
-        else if(this.state.counter >1){
+        else if(this.state.selectedSlotsIndex.length >1){
             alert("You can select one slot at a time!")
         }
         else{
@@ -231,8 +223,8 @@ class User extends React.Component{
                     slotRef.Bookings?Object.keys(slotRef.Bookings).map((slot)=>{
                         console.log(slotRef.Bookings[slot].startTimeHoursMinutes)
                         console.log(slotRef.Bookings[slot].endTimeHoursMinutes)
-                        if(bookingDay===slotRef.Bookings[slot].bookingDay && bookingMonth===slotRef.Bookings[slot].bookingMonth
-                            && bookingYear===slotRef.Bookings[slot].bookingYear){
+                        if(currentDay===bookingDay && currentMonth===bookingMonth
+                            && currentYear===bookingYear){
                                 console.log("if",bookingDay,bookingMonth,bookingYear)
                                 console.log("if",slotRef.Bookings[slot].bookingDay,slotRef.Bookings[slot].bookingMonth,slotRef.Bookings[slot].bookingYear)
                                if(slotRef.Bookings[slot].booked==="true"){
@@ -242,9 +234,10 @@ class User extends React.Component{
                                          }
                                          console.log("green",bookingDay,index)
                                    }
-                                   if((startTime >= slotRef.Bookings[slot].startTime && startTime <= slotRef.Bookings[slot].endTime )||
-                                   (startTime <= slotRef.Bookings[slot].startTime && endTime >= slotRef.Bookings[slot].endTime )||
-                                   (startTime <= slotRef.Bookings[slot].startTime && endTime <= slotRef.Bookings[slot].endTime )){
+                                   else if((startTime >= slotRef.Bookings[slot].startTime && startTime <= slotRef.Bookings[slot].endTime ||
+                                    startTime <= slotRef.Bookings[slot].startTime && endTime >= slotRef.Bookings[slot].startTime)&&
+                                   (bookingDay===slotRef.Bookings[slot].bookingDay && bookingMonth===slotRef.Bookings[slot].bookingMonth &&
+                                     bookingYear===slotRef.Bookings[slot].bookingYear)){
                                     console.log("red",bookingDay,index)
                                     this.state.bgColor.splice(index,1,"red")
                                     }
@@ -259,9 +252,10 @@ class User extends React.Component{
                            console.log("else",slotRef.Bookings[slot].bookingDay,slotRef.Bookings[slot].bookingMonth,slotRef.Bookings[slot].bookingYear)
                            if(slotRef.Bookings[slot].booked==="true"){
                                 console.log("else",bookingDay,slotRef.Bookings[slot].endTime)
-                                if((startTime >= slotRef.Bookings[slot].startTime && startTime <= slotRef.Bookings[slot].endTime )||
-                                   (startTime <= slotRef.Bookings[slot].startTime && endTime >= slotRef.Bookings[slot].endTime )||
-                                   (startTime <= slotRef.Bookings[slot].startTime && endTime <= slotRef.Bookings[slot].endTime )){
+                                if((startTime >= slotRef.Bookings[slot].startTime && startTime <= slotRef.Bookings[slot].endTime ||
+                                    startTime <= slotRef.Bookings[slot].startTime && endTime >= slotRef.Bookings[slot].startTime)&&
+                                   (bookingDay===slotRef.Bookings[slot].bookingDay && bookingMonth===slotRef.Bookings[slot].bookingMonth &&
+                                     bookingYear===slotRef.Bookings[slot].bookingYear)){
                                     console.log("red",bookingDay,index)
                                     this.state.bgColor.splice(index,1,"red")
                                     }
@@ -269,7 +263,7 @@ class User extends React.Component{
                                         console.log("green",bookingDay,index)
                                     this.state.bgColor.splice(index+1,1,"green")
                                     }
-                       }   
+                       }     
                      }
                     }):""
                 })
@@ -280,24 +274,25 @@ class User extends React.Component{
               if(slotIndex===index && this.state.bgColor[index] === "green"){
                 this.state.bgColor.splice(index,1,"yellow")
                     this.setState({
-                        selectedSlotsIndex:slotIndex,
-                        counter:this.state.counter+1
+                        selectedSlotsIndex:this.state.selectedSlotsIndex.concat(slotIndex)
                     })
                     console.log(slotIndex)
 
             }
             else if(slotIndex===index && this.state.bgColor[index] === "yellow"){
                 this.state.bgColor.splice(index,1,"green")
+                let removeIndex=this.state.selectedSlotsIndex.indexOf(slotIndex)
+                console.log(removeIndex)
+                this.state.selectedSlotsIndex.splice(removeIndex,1)
                     this.setState({
-                        selectedSlotsIndex:slotIndex,
-                        counter:this.state.counter -1
+                        selectedSlotsIndex:this.state.selectedSlotsIndex
                     })
                     console.log(slotIndex)
             }
           })
       }
       sendBookedSlots=()=>{
-          if(this.state.selectedSlotsIndex>0){
+          if(this.state.selectedSlotsIndex.length>0){
             console.log(this.state.counter)
             console.log("book",this.state.selectedSlotsIndex)
             let bookingDate=this.state.controlledDate
@@ -323,11 +318,10 @@ class User extends React.Component{
                   })
                   this.setState({
                     open:false,
-                    selectedSlotsIndex:'',
+                    selectedSlotsIndex:[],
                     controlledDate:'',
                     startTime:null,
                     endTime:null,
-                    counter:0
                 })
                 for(let i=0;i<50;i++){
                     this.state.bgColor.splice(i,1,"green")
@@ -496,11 +490,11 @@ class User extends React.Component{
                                     >
                                     {this.state.parkingSlots.map((val,index)=>{
                                          if(this.state.bgColor[index] ==="red"){
-                                            //  console.log(this.state.parkingSlots[index].booked)
+                                             console.log("red")
                                           return  <RaisedButton label={`Slot${index + 1}`} disabled={true}
                                            disabledBackgroundColor="red" style={{margin:"5px"}}/>
                                          }else{
-                                            // console.log(this.state.parkingSlots[index].booked)
+                                            console.log("green")
                                             return <RaisedButton label={`Slot${index + 1}`} style={{margin:"5px"}}
                                                  key={index} backgroundColor={this.state.bgColor[index]}
                                                 onClick={()=>this.bookSlots(index)}/>

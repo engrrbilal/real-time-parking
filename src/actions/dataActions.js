@@ -220,7 +220,7 @@ export const startBooking = (booking={}) => {
       bookingYear='',
       startTime='',
       endTime='',
-      selectedSlotsIndex='',
+      selectedSlotsIndex=[],
       userUid='',
       pushKey='',
       parkingArea='',
@@ -233,16 +233,16 @@ export const startBooking = (booking={}) => {
     firebase.database().ref(`/ParkingAreas/${pushKey}/Slots/`).once('value').then((snapshot) => {
       const data = snapshot.val()
       for (let key in data){
-        if(key == selectedSlotsIndex)
+        if(key == selectedSlotsIndex[0])
          {
           console.log(selectedSlotsIndex+1)
-          let bookingRef = firebase.database().ref(`/ParkingAreas/${pushKey}/Slots/${selectedSlotsIndex}/Bookings`).push()
+          let bookingRef = firebase.database().ref(`/ParkingAreas/${pushKey}/Slots/${selectedSlotsIndex[0]}/Bookings`).push()
           let bookingPushKey =  bookingRef.getKey()
           bookingRef.set({
             booked:"true",bookingDay,bookingMonth,bookingYear,startTime,endTime,userUid,parkingArea,parkingPlace,bookingPushKey:bookingPushKey
           }).then(() => {
             dispatch(bookingData(booking));
-            alert(`You have booked slot ${selectedSlotsIndex+1} from ${startTimeHours}:${startTimeMinutes} to ${endTimeHours}:${endTimeMinutes} successfully!`)
+            alert(`You have booked slot ${selectedSlotsIndex[0]+1} from ${startTimeHours}:${startTimeMinutes} to ${endTimeHours}:${endTimeMinutes} successfully!`)
           })
         }
       }

@@ -163,7 +163,7 @@ render(){
           <Tab label="View Bookings" value={0} />
           <Tab label="Users" value={1} />
           <Tab label="Users Feedback" value={2} />
-          <Tab label="Add Booking Areas" value={3} />
+          <Tab label="Add Parking Areas" value={3} />
         </Tabs>
         <SwipeableViews
           index={this.state.slideIndex}
