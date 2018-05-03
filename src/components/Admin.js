@@ -1,6 +1,7 @@
 import React from 'react';
 import * as firebase from 'firebase';
-import {getUsersData,startDeleteUser,startAddArea,getAreaData,startCancelBooking,getUsersFeedbackData} from '../actions/dataActions'
+import {getUsersData,startDeleteUser,startAddArea,userFeedbackReply,getAreaData,
+        startCancelBooking,getUsersFeedbackData} from '../actions/dataActions'
 import {connect} from 'react-redux'
 import '../App.css';
 import CircularProgress from 'material-ui/CircularProgress';
@@ -9,7 +10,7 @@ import SwipeableViews from 'react-swipeable-views';
 import { ValidatorForm } from 'react-form-validator-core';
 import {RaisedButton,TextField,Paper,Divider,leftAvatar,Avatar} from 'material-ui'
 import {List, ListItem} from 'material-ui/List';
-// import FeedbackIcon from 'react-icons/lib/md/feedback'
+import FeedbackIcon from 'react-icons/lib/md/feedback'
 import {
   Table,
   TableBody,
@@ -26,6 +27,8 @@ import {
     pink400,
     purple500,
 } from 'material-ui/styles/colors';
+import FlatButton from 'material-ui/FlatButton/FlatButton';
+
 const styles = {
     headline: {
       fontSize: 24,
@@ -79,9 +82,10 @@ class Admin extends React.Component{
             userUid:'',
             area:'',
             place:'',
-            slots:''
-          };
-          
+            slots:'',
+            form:false,
+            reply:'',
+          }; 
     }
     componentWillMount(){
       firebase.auth().onAuthStateChanged((user) => {
@@ -117,11 +121,29 @@ class Admin extends React.Component{
   }
   cancelBooking(cancelIndex,pushKey,bookingPushKey){
     console.log(cancelIndex,pushKey,bookingPushKey)
-  this.props.startCancelBooking({
+    this.props.startCancelBooking({
     cancelIndex:cancelIndex,
     pushKey:pushKey,
     bookingPushKey:bookingPushKey
   })
+}
+//Feedback
+toggleForm = () => {
+  this.setState({form: !this.state.form});
+};
+
+submitFeedBackReply = (userUid,feedbackPushKey)=>{
+  console.log(userUid)
+  console.log(feedbackPushKey)
+  this.props.userFeedbackReply({
+    userUid:userUid,
+    replyFeedbackPushKey:feedbackPushKey,
+    displayName:this.state.displayName,
+    reply:this.state.reply
+  })
+  // this.setState({
+  //   reply:''
+  // })
 }
   addArea=()=>{
     if(this.state.area === '' && this.state.place=== '')
@@ -253,23 +275,103 @@ render(){
                 <div style={styles.slide}>
                 <List>
                     {(this.props.usersFeedbacks)?this.props.usersFeedbacks.map((feedback,index)=>{
-                      console.log(feedback)
-                                  return(
-                                    <Paper style={{backgroundColor:"lightBlack"}}>
-                                    <ListItem className="feed" key={index} style={{alignContent:"center"}}
-                                     leftAvatar={<Avatar 
-                                      color={deepOrange300}
-                                      backgroundColor={purple500}
-                                      size={40}>{feedback.userName.slice(0, 1)}</Avatar>}
-                                    primaryText={feedback.feedback} 
-                                          nestedItems={[
-                                            <ListItem style={{marginLeft:"30px",color:"blue"}}
-                                            primaryText={`User Name: ${feedback.userName}`}
-                                                />,
-                                            ]}
+                        return(
+                          feedback.Reply?Object.keys(feedback.Reply).map((reply,index)=>{
+                              return(
+                                <ListItem className="feed" key={index} style={{alignContent:"center"}}
+                                leftIcon={<FeedbackIcon size={40}/>}
+                                primaryText={<div><span style={{color:"blue",fontWeight:"bold"}}>{feedback.userName}</span> 
+                                <span> {feedback.feedback}</span></div>}
+                                  nestedItems={[
+                                      this.state.form ? <form onSubmit={(e)=> {e.preventDefault();this.submitFeedBackReply(feedback.userUid,feedback.feedbackPushKey)}}>
+                                      <div>
+                                        {
+                                          feedback.Reply[reply].replyFeedbackPushKey === feedback.feedbackPushKey?
+                                          <div>
+                                              <span style={{color:"blue",fontWeight:"bold",marginLeft:"70px"}}>{`${feedback.Reply[reply].displayName}: `}</span> 
+                                              <span>{feedback.Reply[reply].reply}</span><br/>
+                                              <TextField
+                                              style={{marginLeft:"70px"}}
+                                              hintText="Write your reply ..."
+                                              onChange={(e) => this.setState({reply: e.target.value})}
+                                              />
+                                              <ListItem style={{marginLeft:"50px",color:"blue"}}
+                                              primaryText="Reply"
+                                              onClick={(e)=> { e.preventDefault(); this.toggleForm()}}
+                                              />
+                                          </div>
+                                        :<div>
+                                          <TextField
+                                          style={{marginLeft:"70px"}}
+                                          hintText="Write your reply ..."
+                                          onChange={(e) => this.setState({reply: e.target.value})}
                                           />
-                                          </Paper>
-                                  )
+                                          <ListItem style={{marginLeft:"50px",color:"blue"}}
+                                          primaryText="Reply"
+                                          onClick={(e)=> { e.preventDefault(); this.toggleForm()}}
+                                          />
+                                        </div>
+                                        }
+                                      </div>
+                                      </form>
+                                      :
+                                      <div>
+                                         {
+                                          feedback.Reply[reply].replyFeedbackPushKey === feedback.feedbackPushKey?
+                                          <div>
+                                              <span style={{color:"blue",fontWeight:"bold",marginLeft:"70px"}}>{`${feedback.Reply[reply].displayName}: `}</span> 
+                                              <span>{feedback.Reply[reply].reply}</span><br/>
+                                              <TextField
+                                              style={{marginLeft:"70px"}}
+                                              hintText="Write your reply ..."
+                                              onChange={(e) => this.setState({reply: e.target.value})}
+                                              />
+                                              <ListItem style={{marginLeft:"50px",color:"blue"}}
+                                              primaryText="Reply"
+                                              onClick={(e)=> { e.preventDefault(); this.toggleForm()}}
+                                              />
+                                          </div>
+                                        :<div>
+                                        <TextField
+                                        style={{marginLeft:"70px"}}
+                                        hintText="Write your reply ..."
+                                        onChange={(e) => this.setState({reply: e.target.value})}
+                                        />
+                                        <ListItem style={{marginLeft:"50px",color:"blue"}}
+                                        primaryText="Reply"
+                                        onClick={(e)=> { e.preventDefault(); this.toggleForm()}}
+                                        />
+                                      </div>
+                                        }
+                                      </div>
+                                    ]}
+                                  />
+                              )
+                            }):<ListItem className="feed" key={index} style={{alignContent:"center"}}
+                            leftIcon={<FeedbackIcon size={40}/>}
+                            primaryText={<div><span style={{color:"blue",fontWeight:"bold"}}>{feedback.userName}</span> 
+                            <span> {feedback.feedback}</span></div>}
+                              nestedItems={[
+                                  this.state.form ? <form onSubmit={(e)=> {e.preventDefault();this.submitFeedBackReply(feedback.userUid,feedback.feedbackPushKey)}}>
+                                  <div>
+                                    <TextField
+                                      style={{marginLeft:"70px"}}
+                                      hintText="Write your reply ..."
+                                      onChange={(e) => this.setState({reply: e.target.value})}
+                                      />
+                                  </div>
+                                  </form>
+                                  :
+                                  <div>
+                                      <span> <ListItem style={{marginLeft:"35px",color:"blue"}}
+                                          primaryText="Reply"
+                                          onClick={(e)=> { e.preventDefault(); this.toggleForm()}}
+                                      /></span>
+                                  </div>
+                                ]}
+                              />
+                      )
+                                  
                                 }):<p style={{marginLeft:20 ,color:"red"}}>No feedback to show!</p>
                                 }
                 </List>   
@@ -340,6 +442,8 @@ const mapStateToProps = (state) => {
     startDeleteUser: (data) => dispatch(startDeleteUser(data)),
     startAddArea: (data) => dispatch(startAddArea(data)),
     startCancelBooking: (data) => dispatch(startCancelBooking(data)),
-    getUsersFeedbackData: (test) => dispatch(getUsersFeedbackData(test))
+    getUsersFeedbackData: (test) => dispatch(getUsersFeedbackData(test)),
+    userFeedbackReply: (data) => dispatch(userFeedbackReply(data)),
+    
   })
 export default connect(mapStateToProps,mapDispatchToProp)(Admin)

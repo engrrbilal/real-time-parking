@@ -9,7 +9,8 @@ const dataReducerDefaultState = {
     parkingArea:[],
     bookedSlots:[],
     cancelSlots:[],
-    usersFeedback:[]
+    usersFeedback:[],
+    feedbackReply:[]
 }
 
 export default (state = dataReducerDefaultState, action) => {
@@ -61,6 +62,12 @@ export default (state = dataReducerDefaultState, action) => {
             return({
                 ...state,
                usersFeedback:action.data
+            })
+            case 'USER-FEEDBACK-REPLY':
+            console.log(action.data)
+            return({
+                ...state,
+               feedbackReply:action.data
             })
         default:
             return state;

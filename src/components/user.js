@@ -1,7 +1,7 @@
 import React from 'react';
 import * as firebase from 'firebase';
 import dataReducer from '../reducers/dataReducer'
-import {getUserProfileData,startUpdateUser,getAreaData,submitUserFeedback,startBooking,startCancelBooking} from '../actions/dataActions'
+import {getUserProfileData,startUpdateUser,getAreaData,submitUserFeedback,getUsersFeedbackData,startBooking,startCancelBooking} from '../actions/dataActions'
 import {connect} from 'react-redux'
 import '../App.css';
 import FlatButton from 'material-ui/FlatButton';
@@ -9,13 +9,14 @@ import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import CircularProgress from 'material-ui/CircularProgress';
-import {List, ListItem,Toggle,Subheader, Dialog,Paper,RaisedButton,Divider,TextField,SelectField} from 'material-ui';
+import {List, ListItem,Toggle,Avatar,Subheader, Dialog,Paper,RaisedButton,Divider,TextField,SelectField} from 'material-ui';
 import ActionInfo from 'material-ui/svg-icons/action/info';
 import {indigo500} from 'material-ui/styles/colors';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import SwipeableViews from 'react-swipeable-views';
 import DatePicker from 'material-ui/DatePicker';
 import TimePicker from 'material-ui/TimePicker';
+import FeedbackIcon from 'react-icons/lib/md/feedback'
 import {
     Table,
     TableBody,
@@ -81,6 +82,9 @@ class User extends React.Component{
           {this.props.getAreaData({
             user:"From user Dispatch"
           })}
+          {this.props.getUsersFeedbackData({
+            Admin:"From admin Dispatch"
+          })}
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 this.setState({ 
@@ -133,7 +137,7 @@ class User extends React.Component{
       handleClose = () => {
         this.setState({
             open:false,
-            selectedSlotsIndex:'',
+            selectedSlotsIndex:[],
             controlledDate:null,
             startTime:null,
             endTime:null,
@@ -166,13 +170,20 @@ class User extends React.Component{
       handleDateChange = (event, date) => {
         this.setState({
           controlledDate: date,
+          selectedSlotsIndex:[]
         });
       };
       handleChangeTimePicker1 = (event, date) => {
-        this.setState({startTime: date});
+        this.setState({
+            startTime: date,
+            selectedSlotsIndex:[]
+        });
       };
       handleChangeTimePicker2 = (event, date) => {
-        this.setState({endTime: date});
+        this.setState({
+            endTime: date,
+            selectedSlotsIndex:[]
+        });
       };
       showBooking = (pushKey,parkingSlots,parkingArea,parkingPlace) =>{
         this.setState({
@@ -189,8 +200,9 @@ class User extends React.Component{
       }
       selectSlots = () => {
 
-        let currentTime = Date.now();
+        // let currentTime = Date.now();
             let todayDate = new Date()
+            let currentTime = new Date(todayDate).getTime()
             let currentDay = todayDate.getDate()
             let currentMonth = todayDate.getMonth()
             let currentHours = todayDate.getHours()
@@ -203,17 +215,26 @@ class User extends React.Component{
             let bookingMonth = bookingDate.getMonth()
             let bookingYear = bookingDate.getFullYear()
             let bookingStartTime = this.state.startTime;
-            let startTime=bookingStartTime.getTime()
+            let startTime=new Date(bookingStartTime).getTime()
+            startTime=startTime+240000
             let bookingEndTime = this.state.endTime;
-            let endTime=bookingEndTime.getTime();
-            if(startTime>endTime){
+            let endTime=new Date(bookingEndTime).getTime()
+            if(endTime <startTime){
                 alert("Please Select the time correctly!")
+            }
+            else if(startTime>=endTime){
+                alert("You can't book slot for less than 5 minutes!")
             }
             else if((currentDay===bookingDay && currentMonth===bookingMonth && currentYear===bookingYear) &&
             (currentTime>startTime|| currentTime>=endTime || startTime>=endTime)){
                     alert("Please Select the time correctly!")
                 
             }
+            else if((currentDay===bookingDay && currentMonth===bookingMonth && currentYear===bookingYear) &&
+                (startTime>endTime)){
+                        alert("You can't book slot for less than 5 minutes!")
+                    
+                }
             else{
                 this.setState({
                     open2:true,
@@ -292,17 +313,46 @@ class User extends React.Component{
           })
       }
       sendBookedSlots=()=>{
-          if(this.state.selectedSlotsIndex.length>0){
-            console.log(this.state.counter)
-            console.log("book",this.state.selectedSlotsIndex)
-            let bookingDate=this.state.controlledDate
-            let bookingDay = bookingDate.getDate();
-            let bookingMonth = bookingDate.getMonth();
-            let bookingYear = bookingDate.getFullYear();
-            let bookingStartTime = this.state.startTime;
-            let startTime=bookingStartTime.getTime()
-            let bookingEndTime = this.state.endTime;
-            let endTime=bookingEndTime.getTime();
+        // let currentTime = Date.now();
+        let todayDate = new Date()
+        let currentTime = new Date(todayDate).getTime()
+        let currentDay = todayDate.getDate()
+        let currentMonth = todayDate.getMonth()
+        let currentYear = todayDate.getFullYear()
+        let bookingDate = this.state.controlledDate
+
+        let bookingDay = bookingDate.getDate()
+        let bookingMonth = bookingDate.getMonth()
+        let bookingYear = bookingDate.getFullYear()
+        let bookingStartTime = this.state.startTime;
+        let startTime=new Date(bookingStartTime).getTime()
+        startTime=startTime+240000
+        let bookingEndTime = this.state.endTime;
+        let endTime=new Date(bookingEndTime).getTime()
+        if(endTime <startTime){
+            alert("Please Select the time correctly!")
+        }
+        else if(startTime>=endTime){
+            alert("You can't book slot for less than 5 minutes!")
+        }
+        else if((currentDay===bookingDay && currentMonth===bookingMonth && currentYear===bookingYear) &&
+        (currentTime>startTime|| currentTime>=endTime || startTime>endTime)){
+                alert("Please Select the time correctly!")
+            
+        }
+        else if((currentDay===bookingDay && currentMonth===bookingMonth && currentYear===bookingYear) &&
+        (startTime>endTime)){
+                alert("You can't book slot for less than 5 minutes!")
+            
+        }
+        else if(this.state.selectedSlotsIndex.length <=0 )
+        {
+            alert("Please select the Slot for booking!")
+        }
+        else if(this.state.selectedSlotsIndex.length >1){
+            alert("You can select one slot at a time!")
+        }
+        else{
             this.props.startBooking({
                     bookingDate:this.state.bookingDate,
                     bookingDay:bookingDay,
@@ -566,7 +616,49 @@ class User extends React.Component{
                             />
                             <RaisedButton label="Submit" primary={true} style={{marginLeft:"40%"}} onClick={this.submitFeedback}/>
                         </ValidatorForm>
-                    </Paper>
+                        </Paper>
+                        <div style={{marginTop:"40px"}}>
+                        <h1 style={{color:"blue",fontFamily:"Times New Roman",textAlign:"center"}}>
+                                Previous feedbacks
+                            </h1>
+                        {(this.props.usersFeedbacks)?this.props.usersFeedbacks.map((feedback,index)=>{
+                            
+                      
+                      if(feedback.userUid === this.state.userUid){
+                        return(
+                            // console.log(feedback.Reply)
+                            feedback.Reply?Object.keys(feedback.Reply).map((reply,index)=>{
+                                console.log(reply)
+                                return(
+                                    <Paper style={{marginTop:"5px"}}>
+                                    <ListItem className="feed" key={index} style={{alignContent:"center"}}
+                                    leftIcon={<FeedbackIcon size={40}/>}
+                                    primaryText={feedback.feedback}
+                                      nestedItems={[
+                                          <div>
+                                            <span style={{color:"blue",fontWeight:"bold"}}>{`${feedback.Reply[reply].displayName}: `}</span> 
+                                            <span>{feedback.Reply[reply].reply}</span>
+                                            <span> <ListItem style={{marginLeft:"35px",color:"blue"}}
+                                                primaryText="Reply"
+                                                onClick={this.submitFeedBackReply}
+                                            /></span>
+                                          </div>
+                                        ]}
+                                    />
+                                    </Paper>
+                                )
+                              }):<Paper style={{marginTop:"5px"}}>
+                              <ListItem className="feed" key={index} style={{alignContent:"center"}}
+                              leftIcon={<FeedbackIcon size={40}/>}
+                              primaryText={feedback.feedback}
+                              />
+                              </Paper>
+                            
+                          )
+                      }    
+                                }):<p style={{marginLeft:20 ,color:"red"}}>No feedback !</p>
+                                }
+                        </div>
                 </div>
                     <div >
                     <Card style={{opacity:"0.7"}}>
@@ -607,7 +699,8 @@ const mapStateToProps = (state) => {
         users: state.dataReducer.userData,
         user: state.dataReducer.userProfile,
         parkingArea:state.dataReducer.parkingArea,
-        bookedSlots:state.dataReducer.bookedSlots
+        bookedSlots:state.dataReducer.bookedSlots,
+        usersFeedbacks:state.dataReducer.usersFeedback
     }   
   }
   const mapDispatchToProp = (dispatch) =>({
@@ -617,5 +710,6 @@ const mapStateToProps = (state) => {
     startBooking: (data) => dispatch(startBooking(data)),
     startCancelBooking: (data) => dispatch(startCancelBooking(data)),
     submitUserFeedback: (data) => dispatch(submitUserFeedback(data)),
+    getUsersFeedbackData: (test) => dispatch(getUsersFeedbackData(test))
   })
 export default connect(mapStateToProps,mapDispatchToProp)(User)

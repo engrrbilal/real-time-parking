@@ -112,14 +112,43 @@ export const userFeedback = (data) => ({
 
 export const submitUserFeedback= (Feedback={}) => {
   return (dispatch) => {
+    let keyRef = firebase.database().ref(`UsersFeedbacks/`).push()
+    let feedbackPushKey = keyRef.getKey()
     const {
       feedback='',
       userUid='',
-      userName=''
+      userName='',
       } = Feedback;
-          firebase.database().ref(`UsersFeedbacks/`).push(Feedback).then(() => {
-            dispatch(userFeedback(Feedback));
+          keyRef.set({feedback:feedback,userUid:userUid,userName:userName,feedbackPushKey:feedbackPushKey})
+          .then(() => {
+            dispatch(userFeedback(Feedback,feedbackPushKey));
             alert("your feedback has submitted ! Thanx for your feedback ")
+          })
+  };
+};
+// USER-FEEDBACK-REPLY
+export const feedbackReply = (data) => ({
+  type: 'USER-FEEDBACK-REPLY',
+  data:data
+});
+
+export const userFeedbackReply= (replyData={}) => {
+  return (dispatch) => {
+    
+    const {
+      userUid='',
+      replyFeedbackPushKey='',
+      adminUid='',
+      reply=''
+      } = replyData;
+      console.log(userUid)
+      console.log(feedbackPushKey)
+      console.log(adminUid)
+      console.log(reply)
+      let keyRef = firebase.database().ref(`UsersFeedbacks/${replyFeedbackPushKey}/Reply/`).push()
+          keyRef.set({userUid:userUid,feedbackPushKey:feedbackPushKey,adminUid:adminUid,reply:reply})
+          .then(() => {
+            dispatch(feedbackReply(replyData))
           })
   };
 };
@@ -262,8 +291,7 @@ export const startCancelBooking = (cancelData={}) => {
       bookingPushKey=''
       } = cancelData;
       console.log(cancelIndex,pushKey)
-          firebase.database().ref(`/ParkingAreas/${pushKey}/Slots/${cancelIndex}/Bookings/${bookingPushKey}/`).update({booked:"false",
-          startTime:'',endTime:'',userUid:'',parkingArea:'',parkingPlace:'',bookingPushKey:''}).then(() => {
+          firebase.database().ref(`/ParkingAreas/${pushKey}/Slots/${cancelIndex}/Bookings/${bookingPushKey}/`).remove().then(() => {
             dispatch(cancelBooking(cancelData));
             alert(`You have Canceled slot ${cancelIndex+1} successfully!`)
           })

@@ -87,7 +87,7 @@ class Signup extends React.Component {
             loading: false,
             error:"Auth error"
           })
-        }, 3000)
+        }, 4000)
       }
   }
   renderButton(){
