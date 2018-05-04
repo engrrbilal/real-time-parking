@@ -1,7 +1,7 @@
 import React from 'react';
 import * as firebase from 'firebase';
 import dataReducer from '../reducers/dataReducer'
-import {getUserProfileData,startUpdateUser,getAreaData,submitUserFeedback,getUsersFeedbackData,startBooking,startCancelBooking} from '../actions/dataActions'
+import {getUserProfileData,startUpdateUser,getAreaData,submitUserFeedback,getUsersFeedbackData,userFeedbackReply,startBooking,startCancelBooking} from '../actions/dataActions'
 import {connect} from 'react-redux'
 import '../App.css';
 import FlatButton from 'material-ui/FlatButton';
@@ -66,7 +66,7 @@ class User extends React.Component{
             bookingDate:'',
             parkingArea:'',
             parkingPlace:'',
-            counter:0,
+            reply:'',
             bgColor:["green","green","green","green","green","green","green","green","green","green",
                     "green","green","green","green","green","green","green","green","green","green",
                     "green","green","green","green","green","green","green","green","green","green",
@@ -133,7 +133,19 @@ class User extends React.Component{
             })
           }
       }
-    
+      submitFeedBackReply = (userUid,feedbackPushKey)=>{
+        console.log(userUid)
+        console.log(feedbackPushKey)
+        this.props.userFeedbackReply({
+          userUid:userUid,
+          replyFeedbackPushKey:feedbackPushKey,
+          displayName:this.state.displayName,
+          reply:this.state.reply
+        })
+        this.setState({
+          reply:''
+        })
+      }
       handleClose = () => {
         this.setState({
             open:false,
@@ -554,7 +566,7 @@ class User extends React.Component{
                                 </div>
                     </div>
                  <div>
-                 <Table style={{opacity:"0.7"}}>
+                 <Table>
                     <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                     <TableRow style={{textAlign:"center"}}>
                       <TableHeaderColumn style={{fontSize:"36",fontWeight:"bold",color:"blue"}}>Slots</TableHeaderColumn>
@@ -603,7 +615,7 @@ class User extends React.Component{
                     </TableBody>
            </Table>
                 </div>
-                <div style={{opacity:"0.7"}}>
+                <div>
                     <Paper zDepth={4} style={{marginLeft:"30%",width:"40%",maxHeight:"200px"}} >
                         <ValidatorForm onSubmit={(e) => e.preventDefault()}>
                         <h1 style={{color:"blue",fontFamily:"Times New Roman",textAlign:"center"}}>
@@ -626,34 +638,33 @@ class User extends React.Component{
                       
                       if(feedback.userUid === this.state.userUid){
                         return(
-                            // console.log(feedback.Reply)
-                            feedback.Reply?Object.keys(feedback.Reply).map((reply,index)=>{
-                                console.log(reply)
-                                return(
-                                    <Paper style={{marginTop:"5px"}}>
-                                    <ListItem className="feed" key={index} style={{alignContent:"center"}}
+                            <ListItem className="feed" key={index} style={{alignContent:"center"}}
                                     leftIcon={<FeedbackIcon size={40}/>}
-                                    primaryText={feedback.feedback}
-                                      nestedItems={[
+                                    primaryText={<div><span> {feedback.feedback}</span></div>}
+                                    nestedItems={[
+                                      <div>
+                                        {feedback.Reply?Object.keys(feedback.Reply).map((reply,index)=>{
+                                        return(
+                                            feedback.Reply[reply].replyFeedbackPushKey === feedback.feedbackPushKey?
                                           <div>
-                                            <span style={{color:"blue",fontWeight:"bold"}}>{`${feedback.Reply[reply].displayName}: `}</span> 
-                                            <span>{feedback.Reply[reply].reply}</span>
-                                            <span> <ListItem style={{marginLeft:"35px",color:"blue"}}
-                                                primaryText="Reply"
-                                                onClick={this.submitFeedBackReply}
-                                            /></span>
+                                              <div style={{marginBottom:"5px"}}>
+                                                <span style={{color:"blue",fontWeight:"bold",marginLeft:"70px",marginTop:"5px"}}>{`${feedback.Reply[reply].displayName}: `}</span> 
+                                                <span>{feedback.Reply[reply].reply}</span><br/>
+                                              </div>
+                                              
                                           </div>
-                                        ]}
-                                    />
-                                    </Paper>
-                                )
-                              }):<Paper style={{marginTop:"5px"}}>
-                              <ListItem className="feed" key={index} style={{alignContent:"center"}}
-                              leftIcon={<FeedbackIcon size={40}/>}
-                              primaryText={feedback.feedback}
-                              />
-                              </Paper>
-                            
+                                          :
+                                          <ListItem style={{marginLeft:"50px",color:"blue"}}
+                                            primaryText="Reply"
+                                            onClick={(e)=> { e.preventDefault(); this.toggleForm()}}
+                                            />
+                                        )
+                                            })
+                                            :<p style={{marginLeft:"70px",color:"red"}}>No reply from admin!</p>
+                                      }
+                                      </div>
+                                    ]}
+                                  />
                           )
                       }    
                                 }):<p style={{marginLeft:20 ,color:"red"}}>No feedback !</p>
@@ -710,6 +721,8 @@ const mapStateToProps = (state) => {
     startBooking: (data) => dispatch(startBooking(data)),
     startCancelBooking: (data) => dispatch(startCancelBooking(data)),
     submitUserFeedback: (data) => dispatch(submitUserFeedback(data)),
-    getUsersFeedbackData: (test) => dispatch(getUsersFeedbackData(test))
+    getUsersFeedbackData: (test) => dispatch(getUsersFeedbackData(test)),
+    userFeedbackReply: (data) => dispatch(userFeedbackReply(data)),
+
   })
 export default connect(mapStateToProps,mapDispatchToProp)(User)

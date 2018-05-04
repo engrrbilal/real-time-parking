@@ -138,15 +138,15 @@ export const userFeedbackReply= (replyData={}) => {
     const {
       userUid='',
       replyFeedbackPushKey='',
-      adminUid='',
+      displayName='',
       reply=''
       } = replyData;
       console.log(userUid)
-      console.log(feedbackPushKey)
-      console.log(adminUid)
+      console.log(replyFeedbackPushKey)
+      console.log(displayName)
       console.log(reply)
       let keyRef = firebase.database().ref(`UsersFeedbacks/${replyFeedbackPushKey}/Reply/`).push()
-          keyRef.set({userUid:userUid,feedbackPushKey:feedbackPushKey,adminUid:adminUid,reply:reply})
+          keyRef.set({userUid:userUid,replyFeedbackPushKey:replyFeedbackPushKey,displayName:displayName,reply:reply})
           .then(() => {
             dispatch(feedbackReply(replyData))
           })

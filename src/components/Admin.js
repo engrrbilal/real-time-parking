@@ -128,22 +128,23 @@ class Admin extends React.Component{
   })
 }
 //Feedback
-toggleForm = () => {
-  this.setState({form: !this.state.form});
-};
-
 submitFeedBackReply = (userUid,feedbackPushKey)=>{
   console.log(userUid)
   console.log(feedbackPushKey)
-  this.props.userFeedbackReply({
-    userUid:userUid,
-    replyFeedbackPushKey:feedbackPushKey,
-    displayName:this.state.displayName,
-    reply:this.state.reply
-  })
-  // this.setState({
-  //   reply:''
-  // })
+  if(this.state.reply === ''){
+    alert("Please write something !")
+  }
+  else{
+    this.props.userFeedbackReply({
+      userUid:userUid,
+      replyFeedbackPushKey:feedbackPushKey,
+      displayName:this.state.displayName,
+      reply:this.state.reply
+    })
+    this.setState({
+      reply:''
+    })
+  }
 }
   addArea=()=>{
     if(this.state.area === '' && this.state.place=== '')
@@ -272,110 +273,53 @@ render(){
                   </TableBody>
                 </Table>
                 </div>
+                
                 <div style={styles.slide}>
-                <List>
-                    {(this.props.usersFeedbacks)?this.props.usersFeedbacks.map((feedback,index)=>{
-                        return(
-                          feedback.Reply?Object.keys(feedback.Reply).map((reply,index)=>{
-                              return(
-                                <ListItem className="feed" key={index} style={{alignContent:"center"}}
-                                leftIcon={<FeedbackIcon size={40}/>}
-                                primaryText={<div><span style={{color:"blue",fontWeight:"bold"}}>{feedback.userName}</span> 
-                                <span> {feedback.feedback}</span></div>}
-                                  nestedItems={[
-                                      this.state.form ? <form onSubmit={(e)=> {e.preventDefault();this.submitFeedBackReply(feedback.userUid,feedback.feedbackPushKey)}}>
+                  <List>
+                      {(this.props.usersFeedbacks)?this.props.usersFeedbacks.map((feedback,index)=>{
+                            return(
+                                    <ListItem className="feed" key={index} style={{alignContent:"center"}}
+                                    leftIcon={<FeedbackIcon size={40}/>}
+                                    primaryText={<div><span style={{color:"blue",fontWeight:"bold"}}>{feedback.userName}</span> 
+                                    <span> {feedback.feedback}</span></div>}
+                                    nestedItems={[
                                       <div>
-                                        {
-                                          feedback.Reply[reply].replyFeedbackPushKey === feedback.feedbackPushKey?
+                                        {feedback.Reply?Object.keys(feedback.Reply).map((reply,index)=>{
+                                        return(
+                                            feedback.Reply[reply].replyFeedbackPushKey === feedback.feedbackPushKey?
                                           <div>
-                                              <span style={{color:"blue",fontWeight:"bold",marginLeft:"70px"}}>{`${feedback.Reply[reply].displayName}: `}</span> 
-                                              <span>{feedback.Reply[reply].reply}</span><br/>
-                                              <TextField
-                                              style={{marginLeft:"70px"}}
-                                              hintText="Write your reply ..."
-                                              onChange={(e) => this.setState({reply: e.target.value})}
-                                              />
-                                              <ListItem style={{marginLeft:"50px",color:"blue"}}
-                                              primaryText="Reply"
-                                              onClick={(e)=> { e.preventDefault(); this.toggleForm()}}
-                                              />
+                                              <div style={{marginBottom:"5px"}}>
+                                                <span style={{color:"blue",fontWeight:"bold",marginLeft:"70px",marginTop:"5px"}}>{`${feedback.Reply[reply].displayName}: `}</span> 
+                                                <span>{feedback.Reply[reply].reply}</span><br/>
+                                              </div>
+                                              
                                           </div>
-                                        :<div>
-                                          <TextField
-                                          style={{marginLeft:"70px"}}
-                                          hintText="Write your reply ..."
-                                          onChange={(e) => this.setState({reply: e.target.value})}
-                                          />
+                                          :
                                           <ListItem style={{marginLeft:"50px",color:"blue"}}
-                                          primaryText="Reply"
-                                          onClick={(e)=> { e.preventDefault(); this.toggleForm()}}
-                                          />
-                                        </div>
-                                        }
-                                      </div>
-                                      </form>
-                                      :
-                                      <div>
-                                         {
-                                          feedback.Reply[reply].replyFeedbackPushKey === feedback.feedbackPushKey?
-                                          <div>
-                                              <span style={{color:"blue",fontWeight:"bold",marginLeft:"70px"}}>{`${feedback.Reply[reply].displayName}: `}</span> 
-                                              <span>{feedback.Reply[reply].reply}</span><br/>
-                                              <TextField
-                                              style={{marginLeft:"70px"}}
-                                              hintText="Write your reply ..."
-                                              onChange={(e) => this.setState({reply: e.target.value})}
-                                              />
-                                              <ListItem style={{marginLeft:"50px",color:"blue"}}
-                                              primaryText="Reply"
-                                              onClick={(e)=> { e.preventDefault(); this.toggleForm()}}
-                                              />
-                                          </div>
-                                        :<div>
+                                            primaryText="Reply"
+                                            onClick={(e)=> { e.preventDefault(); this.toggleForm()}}
+                                            />
+                                        )
+                                            })
+                                            :<p style={{marginLeft:"70px",color:"blue"}}>Reply</p>
+                                      }
+                                      <form onSubmit={(e)=> {e.preventDefault();this.submitFeedBackReply(feedback.userUid,feedback.feedbackPushKey)}}>
                                         <TextField
-                                        style={{marginLeft:"70px"}}
-                                        hintText="Write your reply ..."
-                                        onChange={(e) => this.setState({reply: e.target.value})}
+                                              style={{marginLeft:"70px",width:"60%"}}
+                                              hintText="Write your reply ..."
+                                              value={this.state.reply}
+                                              onChange={(e) => this.setState({reply: e.target.value})}
                                         />
-                                        <ListItem style={{marginLeft:"50px",color:"blue"}}
-                                        primaryText="Reply"
-                                        onClick={(e)=> { e.preventDefault(); this.toggleForm()}}
-                                        />
-                                      </div>
-                                        }
+                                        </form>
                                       </div>
                                     ]}
                                   />
-                              )
-                            }):<ListItem className="feed" key={index} style={{alignContent:"center"}}
-                            leftIcon={<FeedbackIcon size={40}/>}
-                            primaryText={<div><span style={{color:"blue",fontWeight:"bold"}}>{feedback.userName}</span> 
-                            <span> {feedback.feedback}</span></div>}
-                              nestedItems={[
-                                  this.state.form ? <form onSubmit={(e)=> {e.preventDefault();this.submitFeedBackReply(feedback.userUid,feedback.feedbackPushKey)}}>
-                                  <div>
-                                    <TextField
-                                      style={{marginLeft:"70px"}}
-                                      hintText="Write your reply ..."
-                                      onChange={(e) => this.setState({reply: e.target.value})}
-                                      />
-                                  </div>
-                                  </form>
-                                  :
-                                  <div>
-                                      <span> <ListItem style={{marginLeft:"35px",color:"blue"}}
-                                          primaryText="Reply"
-                                          onClick={(e)=> { e.preventDefault(); this.toggleForm()}}
-                                      /></span>
-                                  </div>
-                                ]}
-                              />
-                      )
-                                  
-                                }):<p style={{marginLeft:20 ,color:"red"}}>No feedback to show!</p>
-                                }
-                </List>   
+                                  )
+                              }):<p style={{marginLeft:"70px",color:"red"}}>No feedback to show</p>
+                    }
+                  </List>
                 </div>
+                
           <div style={styles.slide}>
           <Paper zDepth={4} style={styles.style} >
           <ValidatorForm onSubmit={(e) => e.preventDefault()}>
