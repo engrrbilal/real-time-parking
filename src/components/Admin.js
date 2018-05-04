@@ -199,6 +199,8 @@ render(){
                     <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                       <TableRow style={{textAlign:"center"}}>
                          <TableHeaderColumn style={{fontSize:"36",fontWeight:"bold",color:"blue"}}>Slots</TableHeaderColumn>
+                         <TableHeaderColumn style={{fontSize:"36",fontWeight:"bold",color:"blue"}}>Full Name</TableHeaderColumn>
+                        <TableHeaderColumn style={{fontSize:"36",fontWeight:"bold",color:"blue"}}>Email</TableHeaderColumn>
                         <TableHeaderColumn style={{fontSize:"36",fontWeight:"bold",color:"blue"}}>Area</TableHeaderColumn>
                         <TableHeaderColumn style={{fontSize:"36",fontWeight:"bold",color:"blue"}}>Place</TableHeaderColumn>
                         <TableHeaderColumn style={{fontSize:"36",fontWeight:"bold",color:"blue"}}>Date</TableHeaderColumn>
@@ -223,6 +225,8 @@ render(){
                                                 return(
                                                     <TableRow key={index}>
                                                         <TableRowColumn style={{fontSize:"24",fontWeight:"bold"}}>{index+1}</TableRowColumn>
+                                                        <TableRowColumn style={{fontSize:"24",fontWeight:"bold"}}>{slotRef.Bookings[slot].userName}</TableRowColumn>
+                                                        <TableRowColumn style={{fontSize:"24",fontWeight:"bold"}}>{slotRef.Bookings[slot].userEmail}</TableRowColumn>
                                                         <TableRowColumn style={{fontSize:"24",fontWeight:"bold"}}>{slotRef.Bookings[slot].parkingArea}</TableRowColumn>
                                                         <TableRowColumn style={{fontSize:"24",fontWeight:"bold"}}>{slotRef.Bookings[slot].parkingPlace}</TableRowColumn>
                                                         <TableRowColumn style={{fontSize:"24",fontWeight:"bold"}}>{slotRef.Bookings[slot].bookingDay}/{slotRef.Bookings[slot].bookingMonth+1}/
@@ -297,7 +301,6 @@ render(){
                                           :
                                           <ListItem style={{marginLeft:"50px",color:"blue"}}
                                             primaryText="Reply"
-                                            onClick={(e)=> { e.preventDefault(); this.toggleForm()}}
                                             />
                                         )
                                             })

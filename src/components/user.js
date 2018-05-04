@@ -376,7 +376,7 @@ class User extends React.Component{
                     userUid:this.state.userUid,
                     pushKey:this.state.pushKey,
                     parkingArea:this.state.parkingArea,
-                    parkingPlace:this.state.parkingPlace
+                    parkingPlace:this.state.parkingPlace,
                   })
                   this.setState({
                     open:false,
@@ -403,7 +403,6 @@ class User extends React.Component{
             disabled:false,
             update:true,
           })
-   
       }
       updateProfile = ()=>{
            this.applyUpdateDispatch()
@@ -566,7 +565,7 @@ class User extends React.Component{
                                 </div>
                     </div>
                  <div>
-                 <Table>
+                 <Table style={{opacity:"0.7"}}>
                     <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                     <TableRow style={{textAlign:"center"}}>
                       <TableHeaderColumn style={{fontSize:"36",fontWeight:"bold",color:"blue"}}>Slots</TableHeaderColumn>
@@ -615,7 +614,7 @@ class User extends React.Component{
                     </TableBody>
            </Table>
                 </div>
-                <div>
+                <div style={{opacity:"0.7"}}>
                     <Paper zDepth={4} style={{marginLeft:"30%",width:"40%",maxHeight:"200px"}} >
                         <ValidatorForm onSubmit={(e) => e.preventDefault()}>
                         <h1 style={{color:"blue",fontFamily:"Times New Roman",textAlign:"center"}}>
@@ -638,11 +637,12 @@ class User extends React.Component{
                       
                       if(feedback.userUid === this.state.userUid){
                         return(
+                            <Paper zDepth={4} style={{marginLeft:"1%",marginTop:"5px",width:"98%"}} >
                             <ListItem className="feed" key={index} style={{alignContent:"center"}}
                                     leftIcon={<FeedbackIcon size={40}/>}
                                     primaryText={<div><span> {feedback.feedback}</span></div>}
                                     nestedItems={[
-                                      <div>
+                                        <div>
                                         {feedback.Reply?Object.keys(feedback.Reply).map((reply,index)=>{
                                         return(
                                             feedback.Reply[reply].replyFeedbackPushKey === feedback.feedbackPushKey?
@@ -653,18 +653,23 @@ class User extends React.Component{
                                               </div>
                                               
                                           </div>
-                                          :
-                                          <ListItem style={{marginLeft:"50px",color:"blue"}}
-                                            primaryText="Reply"
-                                            onClick={(e)=> { e.preventDefault(); this.toggleForm()}}
-                                            />
+                                          :""
                                         )
                                             })
-                                            :<p style={{marginLeft:"70px",color:"red"}}>No reply from admin!</p>
+                                            :<p style={{marginLeft:"70px",color:"red"}}>No reply from admin</p>
                                       }
+                                      <form onSubmit={(e)=> {e.preventDefault();this.submitFeedBackReply(feedback.userUid,feedback.feedbackPushKey)}}>
+                                        <TextField
+                                              style={{marginLeft:"70px",width:"60%"}}
+                                              hintText="Write your reply ..."
+                                              value={this.state.reply}
+                                              onChange={(e) => this.setState({reply: e.target.value})}
+                                        />
+                                        </form>
                                       </div>
                                     ]}
                                   />
+                                  </Paper>
                           )
                       }    
                                 }):<p style={{marginLeft:20 ,color:"red"}}>No feedback !</p>

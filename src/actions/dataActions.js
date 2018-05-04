@@ -259,6 +259,10 @@ export const startBooking = (booking={}) => {
       let startTimeMinutes=new Date(startTime).getMinutes()
       let endTimeHours=new Date(endTime).getHours()
       let endTimeMinutes=new Date(endTime).getMinutes()
+      firebase.database().ref(`/Users/${userUid}/`).once('value').then((snapshot) => {
+        const data = snapshot.val()
+        const userName = data.fullName
+        const userEmail = data.email
     firebase.database().ref(`/ParkingAreas/${pushKey}/Slots/`).once('value').then((snapshot) => {
       const data = snapshot.val()
       for (let key in data){
@@ -268,7 +272,7 @@ export const startBooking = (booking={}) => {
           let bookingRef = firebase.database().ref(`/ParkingAreas/${pushKey}/Slots/${selectedSlotsIndex[0]}/Bookings`).push()
           let bookingPushKey =  bookingRef.getKey()
           bookingRef.set({
-            booked:"true",bookingDay,bookingMonth,bookingYear,startTime,endTime,userUid,parkingArea,parkingPlace,bookingPushKey:bookingPushKey
+            booked:"true",bookingDay,bookingMonth,bookingYear,startTime,endTime,userUid,parkingArea,parkingPlace,bookingPushKey:bookingPushKey,userName:userName,userEmail:userEmail
           }).then(() => {
             dispatch(bookingData(booking));
             alert(`You have booked slot ${selectedSlotsIndex[0]+1} from ${startTimeHours}:${startTimeMinutes} to ${endTimeHours}:${endTimeMinutes} successfully!`)
@@ -276,6 +280,7 @@ export const startBooking = (booking={}) => {
         }
       }
     })
+  })
   };
 };
  // CANCEL-BOOKING
