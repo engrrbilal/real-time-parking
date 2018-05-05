@@ -67,6 +67,8 @@ class User extends React.Component{
             parkingArea:'',
             parkingPlace:'',
             reply:'',
+            reply2:'',
+            form:false,
             bgColor:["green","green","green","green","green","green","green","green","green","green",
                     "green","green","green","green","green","green","green","green","green","green",
                     "green","green","green","green","green","green","green","green","green","green",
@@ -133,6 +135,9 @@ class User extends React.Component{
             })
           }
       }
+      toggleForm = () => {
+        this.setState({form: !this.state.form});
+    };
       submitFeedBackReply = (userUid,feedbackPushKey)=>{
         console.log(userUid)
         console.log(feedbackPushKey)
@@ -143,8 +148,8 @@ class User extends React.Component{
           reply:this.state.reply
         })
         this.setState({
-          reply:''
-        })
+            reply2:''
+          })
       }
       handleClose = () => {
         this.setState({
@@ -638,7 +643,7 @@ class User extends React.Component{
                       if(feedback.userUid === this.state.userUid){
                         return(
                             <Paper zDepth={4} style={{marginLeft:"1%",marginTop:"5px",width:"98%"}} >
-                            <ListItem className="feed" key={index} style={{alignContent:"center"}}
+                            <ListItem className="feed" key={index} style={{alignContent:"center",fontSize:"34px"}}
                                     leftIcon={<FeedbackIcon size={40}/>}
                                     primaryText={<div><span> {feedback.feedback}</span></div>}
                                     nestedItems={[
@@ -648,8 +653,8 @@ class User extends React.Component{
                                             feedback.Reply[reply].replyFeedbackPushKey === feedback.feedbackPushKey?
                                           <div>
                                               <div style={{marginBottom:"5px"}}>
-                                                <span style={{color:"blue",fontWeight:"bold",marginLeft:"70px",marginTop:"5px"}}>{`${feedback.Reply[reply].displayName}: `}</span> 
-                                                <span>{feedback.Reply[reply].reply}</span><br/>
+                                                <span style={{color:"blue",fontWeight:"bold",marginLeft:"70px",marginTop:"5px",fontSize:"20px"}}>{`${feedback.Reply[reply].displayName}: `}</span> 
+                                                <span style={{fontSize:"18px"}}>{feedback.Reply[reply].reply}</span><br/>
                                               </div>
                                               
                                           </div>
@@ -662,7 +667,7 @@ class User extends React.Component{
                                         <TextField
                                               style={{marginLeft:"70px",width:"60%"}}
                                               hintText="Write your reply ..."
-                                              value={this.state.reply}
+                                              value={this.state.reply2}
                                               onChange={(e) => this.setState({reply: e.target.value})}
                                         />
                                         </form>

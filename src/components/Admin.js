@@ -141,9 +141,6 @@ submitFeedBackReply = (userUid,feedbackPushKey)=>{
       displayName:this.state.displayName,
       reply:this.state.reply
     })
-    this.setState({
-      reply:''
-    })
   }
 }
   addArea=()=>{
@@ -284,8 +281,8 @@ render(){
                             return(
                                     <ListItem className="feed" key={index} style={{alignContent:"center"}}
                                     leftIcon={<FeedbackIcon size={40}/>}
-                                    primaryText={<div><span style={{color:"blue",fontWeight:"bold"}}>{feedback.userName}</span> 
-                                    <span> {feedback.feedback}</span></div>}
+                                    primaryText={<div><span style={{color:"blue",fontWeight:"bold",fontSize:"20px"}}>{feedback.userName}</span> 
+                                    <span style={{fontSize:"18px"}}> {feedback.feedback}</span></div>}
                                     nestedItems={[
                                       <div>
                                         {feedback.Reply?Object.keys(feedback.Reply).map((reply,index)=>{
@@ -293,8 +290,8 @@ render(){
                                             feedback.Reply[reply].replyFeedbackPushKey === feedback.feedbackPushKey?
                                           <div>
                                               <div style={{marginBottom:"5px"}}>
-                                                <span style={{color:"blue",fontWeight:"bold",marginLeft:"70px",marginTop:"5px"}}>{`${feedback.Reply[reply].displayName}: `}</span> 
-                                                <span>{feedback.Reply[reply].reply}</span><br/>
+                                                <span style={{color:"blue",fontWeight:"bold",marginLeft:"70px",marginTop:"5px",fontSize:"18px"}}>{`${feedback.Reply[reply].displayName}: `}</span> 
+                                                <span style={{fontSize:"18px"}}>{feedback.Reply[reply].reply}</span><br/>
                                               </div>
                                               
                                           </div>
@@ -307,10 +304,10 @@ render(){
                                             :<p style={{marginLeft:"70px",color:"blue"}}>Reply</p>
                                       }
                                       <form onSubmit={(e)=> {e.preventDefault();this.submitFeedBackReply(feedback.userUid,feedback.feedbackPushKey)}}>
-                                        <TextField
+                                        <TextField className="input"
                                               style={{marginLeft:"70px",width:"60%"}}
                                               hintText="Write your reply ..."
-                                              value={this.state.reply}
+                                              // value={this.state.reply}
                                               onChange={(e) => this.setState({reply: e.target.value})}
                                         />
                                         </form>
